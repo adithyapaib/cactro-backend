@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventa — Book Extraordinary Moments</title>
+
+  <!-- Fonts: DM Sans for body, Fraunces for display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,800;1,9..144,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════
+       DESIGN TOKENS
+       Aesthetic: Editorial / Museum-catalog meets
+       warm terracotta + sage palette
+    ═══════════════════════════════════════════ */
+    :root {
+      /* Warm-tinted neutrals */
+      --ink:       oklch(18% 0.015 55);
+      --ink-soft:  oklch(38% 0.012 55);
+      --ink-muted: oklch(55% 0.008 55);
+      --surface:   oklch(97.5% 0.008 80);
+      --surface-raised: oklch(99% 0.005 80);
+      --surface-sunken: oklch(94% 0.012 80);
+      --border:    oklch(88% 0.015 80);
+      --border-light: oklch(92% 0.01 80);
+
+      /* Accent: warm terracotta */
+      --accent:        oklch(58% 0.14 35);
+      --accent-hover:  oklch(52% 0.16 35);
+      --accent-soft:   oklch(90% 0.05 35);
+      --accent-text:   oklch(98% 0.01 35);
+
+      /* Semantic */
+      --success:   oklch(55% 0.14 155);
+      --success-bg:oklch(93% 0.04 155);
+      --error:     oklch(55% 0.18 25);
+      --error-bg:  oklch(93% 0.05 25);
+      --warning:   oklch(70% 0.14 80);
+
+      /* Sage secondary */
+      --sage:      oklch(62% 0.06 155);
+      --sage-soft: oklch(93% 0.025 155);
+
+      /* Typography */
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body:    'DM Sans', system-ui, sans-serif;
+
+      /* Spacing (4pt base) */
+      --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+      --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+      --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+      --sp-16: 64px; --sp-20: 80px;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+      --ease-in:  cubic-bezier(0.7, 0, 0.84, 0);
+      --duration-fast: 150ms;
+      --duration-med:  250ms;
+      --duration-slow: 400ms;
+
+      /* Radius */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT SHELL
+    ═══════════════════════════════════════════ */
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 100vh;
+    }
+
+    /* ─── NAV BAR ─── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-4) clamp(var(--sp-6), 5vw, var(--sp-16));
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-raised);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(1.25rem, 2vw, 1.5rem);
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--accent); }
+
+    .nav-actions { display: flex; gap: var(--sp-3); align-items: center; }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      font-size: 13px;
+      color: var(--ink-soft);
+    }
+
+    .nav-role {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .nav-role.organizer { background: var(--sage-soft); color: var(--sage); }
+    .nav-role.customer  { background: var(--accent-soft); color: var(--accent); }
+
+    /* ─── MAIN CONTENT ─── */
+    .main-content {
+      padding: var(--sp-10) clamp(var(--sp-6), 5vw, var(--sp-16));
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════
+       AUTH VIEWS
+    ═══════════════════════════════════════════ */
+    .auth-wrapper {
+      display: grid;
+      place-items: center;
+      min-height: calc(100vh - 65px);
+      padding: var(--sp-8);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+      animation: fadeSlideUp var(--duration-slow) var(--ease-out) both;
+    }
+
+    .auth-header {
+      margin-bottom: var(--sp-10);
+      text-align: left;
+    }
+
+    .auth-header h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+      letter-spacing: -0.03em;
+      margin-bottom: var(--sp-2);
+    }
+
+    .auth-header p {
+      color: var(--ink-muted);
+      font-size: 14px;
+    }
+
+    .auth-toggle {
+      margin-top: var(--sp-6);
+      text-align: center;
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .auth-toggle a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .auth-toggle a:hover { text-decoration: underline; }
+
+    /* ═══════════════════════════════════════════
+       FORM ELEMENTS
+    ═══════════════════════════════════════════ */
+    .field {
+      margin-bottom: var(--sp-5);
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      margin-bottom: var(--sp-1);
+      letter-spacing: 0.01em;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: var(--sp-3) var(--sp-4);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--ink);
+      background: var(--surface-raised);
+      transition: border-color var(--duration-fast) var(--ease-out),
+                  box-shadow var(--duration-fast) var(--ease-out);
+      outline: none;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .field input::placeholder { color: var(--ink-muted); opacity: 0.6; }
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .field select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      padding: var(--sp-3) var(--sp-6);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-text);
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink-soft);
+      border: 1.5px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--ink-muted); color: var(--ink); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-soft);
+      padding: var(--sp-2) var(--sp-3);
+    }
+    .btn-ghost:hover { color: var(--ink); background: var(--surface-sunken); }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--error);
+      border: 1.5px solid oklch(85% 0.05 25);
+    }
+    .btn-danger:hover { background: var(--error-bg); }
+
+    .btn-full { width: 100%; }
+
+    .btn-sm { padding: var(--sp-2) var(--sp-4); font-size: 13px; }
+
+    /* ═══════════════════════════════════════════
+       PAGE HEADERS
+    ═══════════════════════════════════════════ */
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: var(--sp-8);
+      gap: var(--sp-4);
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--ink-muted);
+      margin-top: var(--sp-1);
+    }
+
+    /* ═══════════════════════════════════════════
+       EVENT CARDS — Editorial list layout
+    ═══════════════════════════════════════════ */
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border-light);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .event-card {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: var(--sp-6);
+      align-items: center;
+      padding: var(--sp-6) var(--sp-8);
+      background: var(--surface-raised);
+      transition: background var(--duration-fast) var(--ease-out);
+      animation: fadeSlideUp var(--duration-slow) var(--ease-out) both;
+      animation-delay: calc(var(--i, 0) * 60ms);
+      cursor: pointer;
+    }
+    .event-card:hover { background: oklch(98% 0.006 80); }
+
+    .event-date-block {
+      text-align: center;
+      padding: var(--sp-3) var(--sp-4);
+      background: var(--surface-sunken);
+      border-radius: var(--radius-sm);
+    }
+    .event-date-block .month {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+    .event-date-block .day {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+    .event-date-block .year {
+      display: block;
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .event-info h3 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+      margin-bottom: var(--sp-1);
+    }
+
+    .event-meta {
+      display: flex;
+      gap: var(--sp-4);
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .event-meta svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 3px; opacity: 0.5; }
+
+    .event-tickets {
+      text-align: right;
+      min-width: 100px;
+    }
+    .event-tickets .count {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .event-tickets .label {
+      font-size: 11px;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── Empty state ─── */
+    .empty-state {
+      text-align: center;
+      padding: var(--sp-20) var(--sp-8);
+      color: var(--ink-muted);
+    }
+    .empty-state svg { width: 48px; height: 48px; opacity: 0.3; margin-bottom: var(--sp-4); }
+    .empty-state h3 {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-bottom: var(--sp-2);
+    }
+    .empty-state p { font-size: 14px; margin-bottom: var(--sp-6); }
+
+    /* ═══════════════════════════════════════════
+       EVENT DETAIL / BOOKING PANEL
+    ═══════════════════════════════════════════ */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: var(--sp-12);
+      align-items: start;
+      animation: fadeSlideUp var(--duration-slow) var(--ease-out) both;
+    }
+
+    .detail-back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-size: 13px;
+      color: var(--ink-muted);
+      text-decoration: none;
+      cursor: pointer;
+      margin-bottom: var(--sp-6);
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+    .detail-back:hover { color: var(--ink); }
+
+    .detail-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      margin-bottom: var(--sp-4);
+    }
+
+    .detail-date {
+      font-size: 15px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: var(--sp-2);
+    }
+
+    .detail-location {
+      font-size: 14px;
+      color: var(--ink-muted);
+      margin-bottom: var(--sp-8);
+    }
+
+    .detail-description {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      max-width: 55ch;
+    }
+
+    /* Booking sidebar */
+    .booking-panel {
+      padding: var(--sp-8);
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      position: sticky;
+      top: 90px;
+    }
+
+    .booking-panel h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: var(--sp-6);
+    }
+
+    .ticket-info {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--sp-4) 0;
+      border-top: 1px solid var(--border-light);
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+    .ticket-info:last-of-type { border-bottom: 1px solid var(--border-light); margin-bottom: var(--sp-6); }
+    .ticket-info strong { color: var(--ink); }
+
+    /* ═══════════════════════════════════════════
+       ORGANIZER: EVENT FORM MODAL (inline)
+    ═══════════════════════════════════════════ */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: oklch(18% 0.015 55 / 0.4);
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      padding: var(--sp-6);
+      animation: fadeIn var(--duration-med) var(--ease-out) both;
+    }
+
+    .dialog {
+      background: var(--surface-raised);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-10);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: scaleIn var(--duration-med) var(--ease-out) both;
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--sp-8);
+    }
+    .dialog-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .close-btn {
+      width: 32px; height: 32px;
+      display: grid; place-items: center;
+      border: none; background: transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer; color: var(--ink-muted);
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+    .close-btn:hover { background: var(--surface-sunken); color: var(--ink); }
+
+    /* ═══════════════════════════════════════════
+       TOAST NOTIFICATIONS
+    ═══════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: var(--sp-6);
+      right: var(--sp-6);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+
+    .toast {
+      padding: var(--sp-4) var(--sp-6);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      animation: slideInRight var(--duration-med) var(--ease-out) both;
+      max-width: 360px;
+    }
+    .toast.success { background: var(--success-bg); color: oklch(30% 0.06 155); border-left: 3px solid var(--success); }
+    .toast.error   { background: var(--error-bg);   color: oklch(30% 0.06 25);  border-left: 3px solid var(--error); }
+
+    /* ═══════════════════════════════════════════
+       MY BOOKINGS
+    ═══════════════════════════════════════════ */
+    .bookings-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+    }
+    .bookings-table th {
+      text-align: left;
+      padding: var(--sp-3) var(--sp-4);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      border-bottom: 2px solid var(--border);
+    }
+    .bookings-table td {
+      padding: var(--sp-4);
+      border-bottom: 1px solid var(--border-light);
+      color: var(--ink-soft);
+    }
+    .bookings-table tr { animation: fadeSlideUp var(--duration-slow) var(--ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
+
+    /* ═══════════════════════════════════════════
+       TAB NAVIGATION
+    ═══════════════════════════════════════════ */
+    .tabs {
+      display: flex;
+      gap: var(--sp-1);
+      margin-bottom: var(--sp-8);
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      padding: var(--sp-3) var(--sp-5);
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-muted);
+      cursor: pointer;
+      position: relative;
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active { color: var(--ink); }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0; right: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* ═══════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════ */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .hidden { display: none !important; }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .event-card {
+        grid-template-columns: 80px 1fr;
+        gap: var(--sp-4);
+        padding: var(--sp-5);
+      }
+      .event-tickets { grid-column: 1 / -1; text-align: left; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .booking-panel { position: static; }
+      .field-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ═══════════════════════════════════════════
+       NAV BAR
+  ═══════════════════════════════════════════ -->
+  <nav class="nav">
+    <a class="nav-brand" href="#" onclick="goHome()">event<span>a</span></a>
+    <div class="nav-actions">
+      <!-- Shown when logged out -->
+      <div id="nav-guest">
+        <button class="btn btn-secondary btn-sm" onclick="showView('login')">Sign in</button>
+      </div>
+      <!-- Shown when logged in -->
+      <div id="nav-user" class="hidden">
+        <div class="nav-user">
+          <span id="nav-username"></span>
+          <span class="nav-role" id="nav-role"></span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════
+       AUTH: LOGIN
+  ═══════════════════════════════════════════ -->
+  <div id="view-login" class="auth-wrapper hidden">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Welcome back</h1>
+        <p>Sign in to continue to your events.</p>
+      </div>
+      <form onsubmit="handleLogin(event)">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="Your password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">Sign in</button>
+      </form>
+      <div class="auth-toggle">
+        Don't have an account? <a onclick="showView('register')">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       AUTH: REGISTER
+  ═══════════════════════════════════════════ -->
+  <div id="view-register" class="auth-wrapper hidden">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create account</h1>
+        <p>Join to book events or organize your own.</p>
+      </div>
+      <form onsubmit="handleRegister(event)">
+        <div class="field">
+          <label for="reg-name">Name</label>
+          <input type="text" id="reg-name" required placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label for="reg-email">Email</label>
+          <input type="email" id="reg-email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="At least 6 characters">
+        </div>
+        <div class="field">
+          <label for="reg-role">I want to</label>
+          <select id="reg-role" required>
+            <option value="customer">Book events (Customer)</option>
+            <option value="organizer">Organize events (Organizer)</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="reg-btn">Create account</button>
+      </form>
+      <div class="auth-toggle">
+        Already have an account? <a onclick="showView('login')">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       DASHBOARD — CUSTOMER
+  ═══════════════════════════════════════════ -->
+  <div id="view-customer" class="main-content hidden">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('browse', this)">Browse Events</button>
+      <button class="tab-btn" onclick="switchTab('my-bookings', this)">My Bookings</button>
+    </div>
+
+    <!-- Browse tab -->
+    <div id="tab-browse">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Upcoming Events</h1>
+          <p class="page-subtitle">Find something extraordinary to attend.</p>
+        </div>
+      </div>
+      <div id="customer-events-list" class="events-list"></div>
+    </div>
+
+    <!-- My bookings tab -->
+    <div id="tab-my-bookings" class="hidden">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Bookings</h1>
+          <p class="page-subtitle">Your confirmed tickets.</p>
+        </div>
+      </div>
+      <div id="customer-bookings-container"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       DASHBOARD — ORGANIZER
+  ═══════════════════════════════════════════ -->
+  <div id="view-organizer" class="main-content hidden">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Your Events</h1>
+        <p class="page-subtitle">Manage your organized events.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openEventForm()">+ New Event</button>
+    </div>
+    <div id="organizer-events-list" class="events-list"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       EVENT DETAIL (shared)
+  ═══════════════════════════════════════════ -->
+  <div id="view-detail" class="main-content hidden"></div>
+
+  <!-- ═══════════════════════════════════════════
+       EVENT FORM DIALOG
+  ═══════════════════════════════════════════ -->
+  <div id="event-form-overlay" class="overlay hidden" onclick="closeEventForm(event)">
+    <div class="dialog" onclick="event.stopPropagation()">
+      <div class="dialog-header">
+        <h2 id="event-form-title">New Event</h2>
+        <button class="close-btn" onclick="closeEventForm()" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="handleEventSubmit(event)">
+        <div class="field">
+          <label for="ev-title">Title</label>
+          <input type="text" id="ev-title" required placeholder="Event name">
+        </div>
+        <div class="field">
+          <label for="ev-description">Description</label>
+          <textarea id="ev-description" placeholder="What's this event about?"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="ev-location">Location</label>
+            <input type="text" id="ev-location" placeholder="Venue or address">
+          </div>
+          <div class="field">
+            <label for="ev-tickets">Total Tickets</label>
+            <input type="number" id="ev-tickets" required min="1" placeholder="100">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ev-date">Event Date & Time</label>
+          <input type="datetime-local" id="ev-date" required>
+        </div>
+        <input type="hidden" id="ev-id">
+        <button type="submit" class="btn btn-primary btn-full" id="ev-submit-btn">Create Event</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   STATE & CONFIG
+═══════════════════════════════════════════════ */
+const API = '';  // same origin — served by FastAPI
+let state = {
+  token: null,
+  user: null,     // { id, name, email, role }
+  events: [],
+  myBookings: []
+};
+
+/* ═══════════════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════════════ */
+async function api(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...options.headers };
+  if (state.token) headers['Authorization'] = `Bearer ${state.token}`;
+
+  const res = await fetch(API + path, { ...options, headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+    throw new Error(err.detail || 'Request failed');
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+/* ═══════════════════════════════════════════════
+   VIEW MANAGEMENT
+═══════════════════════════════════════════════ */
+function showView(name) {
+  // Hide all views
+  document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+  const view = document.getElementById(`view-${name}`);
+  if (view) view.classList.remove('hidden');
+}
+
+function updateNav() {
+  const guest = document.getElementById('nav-guest');
+  const user  = document.getElementById('nav-user');
+  if (state.user) {
+    guest.classList.add('hidden');
+    user.classList.remove('hidden');
+    document.getElementById('nav-username').textContent = state.user.name;
+    const roleEl = document.getElementById('nav-role');
+    roleEl.textContent = state.user.role;
+    roleEl.className = `nav-role ${state.user.role}`;
+  } else {
+    guest.classList.remove('hidden');
+    user.classList.add('hidden');
+  }
+}
+
+function goHome() {
+  if (!state.user) { showView('login'); return; }
+  if (state.user.role === 'organizer') { showView('organizer'); loadOrganizerEvents(); }
+  else { showView('customer'); loadAllEvents(); }
+}
+
+/* ═══════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════ */
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in…';
+  try {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    const data = await api('/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    state.token = data.access_token;
+
+    // Decode JWT payload to get user info
+    const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+    // We need user details — fetch from a lightweight trick:
+    // Re-register will fail, so we store email/role from token + login form
+    state.user = { id: payload.user_id, name: email.split('@')[0], email, role: payload.role };
+
+    saveSession();
+    updateNav();
+    toast('Signed in successfully', 'success');
+    goHome();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.textContent = 'Sign in';
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('reg-btn');
+  btn.textContent = 'Creating…';
+  try {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+
+    const user = await api('/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password, role })
+    });
+
+    // Auto-login after registration
+    const loginData = await api('/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+    state.token = loginData.access_token;
+    state.user = { id: user.id, name: user.name, email: user.email, role: user.role };
+
+    saveSession();
+    updateNav();
+    toast(`Welcome, ${user.name}!`, 'success');
+    goHome();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.textContent = 'Create account';
+  }
+}
+
+function logout() {
+  state.token = null;
+  state.user = null;
+  sessionStorage.removeItem('eventa_session');
+  updateNav();
+  showView('login');
+}
+
+function saveSession() {
+  sessionStorage.setItem('eventa_session', JSON.stringify({ token: state.token, user: state.user }));
+}
+
+function restoreSession() {
+  const saved = sessionStorage.getItem('eventa_session');
+  if (saved) {
+    const { token, user } = JSON.parse(saved);
+    state.token = token;
+    state.user = user;
+    updateNav();
+    goHome();
+  } else {
+    showView('login');
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   EVENTS — BROWSE (Customer)
+═══════════════════════════════════════════════ */
+async function loadAllEvents() {
+  try {
+    state.events = await api('/events');
+    renderEventsList('customer-events-list', state.events, 'customer');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ═══════════════════════════════════════════════
+   EVENTS — ORGANIZER
+═══════════════════════════════════════════════ */
+async function loadOrganizerEvents() {
+  try {
+    state.events = await api('/organizer/events');
+    renderEventsList('organizer-events-list', state.events, 'organizer');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ═══════════════════════════════════════════════
+   RENDER EVENT LIST
+═══════════════════════════════════════════════ */
+function renderEventsList(containerId, events, mode) {
+  const el = document.getElementById(containerId);
+  if (!events.length) {
+    el.className = '';
+    el.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+        <h3>${mode === 'organizer' ? 'No events yet' : 'No events available'}</h3>
+        <p>${mode === 'organizer' ? 'Create your first event to get started.' : 'Check back later for upcoming events.'}</p>
+        ${mode === 'organizer' ? '<button class="btn btn-primary" onclick="openEventForm()">+ New Event</button>' : ''}
+      </div>`;
+    return;
+  }
+  el.className = 'events-list';
+  el.innerHTML = events.map((ev, i) => {
+    const d = new Date(ev.event_date);
+    const month = d.toLocaleString('en', { month: 'short' }).toUpperCase();
+    const day = d.getDate();
+    const year = d.getFullYear();
+    return `
+      <div class="event-card" style="--i:${i}" onclick="viewEvent(${ev.id})">
+        <div class="event-date-block">
+          <span class="month">${month}</span>
+          <span class="day">${day}</span>
+          <span class="year">${year}</span>
+        </div>
+        <div class="event-info">
+          <h3>${esc(ev.title)}</h3>
+          <div class="event-meta">
+            ${ev.location ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(ev.location)}</span>` : ''}
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+          </div>
+        </div>
+        <div class="event-tickets">
+          <div class="count">${ev.available_tickets}</div>
+          <div class="label">tickets left</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   EVENT DETAIL
+═══════════════════════════════════════════════ */
+async function viewEvent(id) {
+  try {
+    const ev = await api(`/events/${id}`);
+    const d = new Date(ev.event_date);
+    const dateStr = d.toLocaleDateString('en', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    const isOrganizer = state.user.role === 'organizer' && ev.organizer_id === state.user.id;
+
+    document.getElementById('view-detail').innerHTML = `
+      <a class="detail-back" onclick="goHome()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to events
+      </a>
+      <div class="detail-grid">
+        <div>
+          <h1 class="detail-title">${esc(ev.title)}</h1>
+          <div class="detail-date">${dateStr} at ${timeStr}</div>
+          <div class="detail-location">${ev.location ? esc(ev.location) : 'No location specified'}</div>
+          ${ev.description ? `<p class="detail-description">${esc(ev.description)}</p>` : ''}
+          ${isOrganizer ? `
+            <div style="margin-top:var(--sp-8); display:flex; gap:var(--sp-3);">
+              <button class="btn btn-secondary btn-sm" onclick="openEventForm(${ev.id})">Edit Event</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteEvent(${ev.id})">Delete Event</button>
+            </div>` : ''}
+        </div>
+        ${state.user.role === 'customer' ? `
+        <div class="booking-panel">
+          <h3>Book Tickets</h3>
+          <div class="ticket-info"><span>Total tickets</span><strong>${ev.total_tickets}</strong></div>
+          <div class="ticket-info"><span>Available</span><strong>${ev.available_tickets}</strong></div>
+          ${ev.available_tickets > 0 ? `
+            <form onsubmit="bookTickets(event, ${ev.id})">
+              <div class="field">
+                <label for="book-qty">Number of tickets</label>
+                <input type="number" id="book-qty" min="1" max="${ev.available_tickets}" value="1" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full" id="book-btn">Book Now</button>
+            </form>
+          ` : '<p style="color:var(--error);font-weight:500;text-align:center;padding:var(--sp-4) 0;">Sold out</p>'}
+        </div>` : ''}
+      </div>`;
+    showView('detail');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ═══════════════════════════════════════════════
+   BOOKING
+═══════════════════════════════════════════════ */
+async function bookTickets(e, eventId) {
+  e.preventDefault();
+  const btn = document.getElementById('book-btn');
+  btn.textContent = 'Booking…';
+  try {
+    const tickets = parseInt(document.getElementById('book-qty').value, 10);
+    await api(`/events/${eventId}/book`, {
+      method: 'POST',
+      body: JSON.stringify({ tickets })
+    });
+    toast('Booking confirmed! Check your email.', 'success');
+    viewEvent(eventId);  // refresh
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.textContent = 'Book Now';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   MY BOOKINGS (Customer)
+═══════════════════════════════════════════════ */
+async function loadMyBookings() {
+  try {
+    // Fetch all events to map event names, then filter bookings
+    const events = await api('/events');
+    // There's no dedicated bookings endpoint for customers,
+    // so we'll use event available_tickets diff to show booked info.
+    // Actually, let's add a simple endpoint or work with what we have.
+    // For now, we track bookings client-side from successful book calls.
+    // We'll store them in sessionStorage.
+    const bookings = JSON.parse(sessionStorage.getItem('eventa_bookings') || '[]');
+    const container = document.getElementById('customer-bookings-container');
+    if (!bookings.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 002 2 2 2 0 010 4 2 2 0 00-2 2v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 00-2-2 2 2 0 010-4 2 2 0 002-2V7a2 2 0 00-2-2H5z"/>
+          </svg>
+          <h3>No bookings yet</h3>
+          <p>Browse events and book your first tickets.</p>
+        </div>`;
+      return;
+    }
+    const evMap = {};
+    events.forEach(ev => evMap[ev.id] = ev);
+    container.innerHTML = `
+      <table class="bookings-table">
+        <thead><tr><th>Event</th><th>Date</th><th>Tickets</th><th>Booked at</th></tr></thead>
+        <tbody>
+          ${bookings.map((b, i) => {
+            const ev = evMap[b.event_id];
+            const evDate = ev ? new Date(ev.event_date).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+            return `<tr style="--i:${i}">
+              <td style="font-weight:500;color:var(--ink)">${ev ? esc(ev.title) : `Event #${b.event_id}`}</td>
+              <td>${evDate}</td>
+              <td>${b.tickets_booked}</td>
+              <td>${new Date(b.booking_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+// Override bookTickets to also save locally
+const _origBook = bookTickets;
+bookTickets = async function(e, eventId) {
+  e.preventDefault();
+  const btn = document.getElementById('book-btn');
+  btn.textContent = 'Booking…';
+  try {
+    const tickets = parseInt(document.getElementById('book-qty').value, 10);
+    const result = await api(`/events/${eventId}/book`, {
+      method: 'POST',
+      body: JSON.stringify({ tickets })
+    });
+    // Save booking locally
+    const bookings = JSON.parse(sessionStorage.getItem('eventa_bookings') || '[]');
+    bookings.unshift(result);
+    sessionStorage.setItem('eventa_bookings', JSON.stringify(bookings));
+
+    toast('Booking confirmed! Check your email.', 'success');
+    viewEvent(eventId);
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    if (document.getElementById('book-btn')) document.getElementById('book-btn').textContent = 'Book Now';
+  }
+};
+
+/* ═══════════════════════════════════════════════
+   EVENT FORM (Create / Edit)
+═══════════════════════════════════════════════ */
+async function openEventForm(editId) {
+  const overlay = document.getElementById('event-form-overlay');
+  const title = document.getElementById('event-form-title');
+  const submitBtn = document.getElementById('ev-submit-btn');
+  document.getElementById('ev-id').value = '';
+
+  if (editId) {
+    title.textContent = 'Edit Event';
+    submitBtn.textContent = 'Save Changes';
+    try {
+      const ev = await api(`/events/${editId}`);
+      document.getElementById('ev-title').value = ev.title;
+      document.getElementById('ev-description').value = ev.description || '';
+      document.getElementById('ev-location').value = ev.location || '';
+      document.getElementById('ev-tickets').value = ev.total_tickets;
+      // Format date for datetime-local input
+      const d = new Date(ev.event_date);
+      const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('ev-date').value = local;
+      document.getElementById('ev-id').value = editId;
+    } catch (err) { toast(err.message, 'error'); return; }
+  } else {
+    title.textContent = 'New Event';
+    submitBtn.textContent = 'Create Event';
+    document.getElementById('ev-title').value = '';
+    document.getElementById('ev-description').value = '';
+    document.getElementById('ev-location').value = '';
+    document.getElementById('ev-tickets').value = '';
+    document.getElementById('ev-date').value = '';
+  }
+  overlay.classList.remove('hidden');
+}
+
+function closeEventForm(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('event-form-overlay').classList.add('hidden');
+}
+
+async function handleEventSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('ev-submit-btn');
+  const editId = document.getElementById('ev-id').value;
+  const payload = {
+    title: document.getElementById('ev-title').value,
+    description: document.getElementById('ev-description').value || null,
+    location: document.getElementById('ev-location').value || null,
+    event_date: new Date(document.getElementById('ev-date').value).toISOString(),
+    total_tickets: parseInt(document.getElementById('ev-tickets').value, 10)
+  };
+
+  btn.textContent = editId ? 'Saving…' : 'Creating…';
+  try {
+    if (editId) {
+      await api(`/events/${editId}`, { method: 'PUT', body: JSON.stringify(payload) });
+      toast('Event updated', 'success');
+    } else {
+      await api('/events', { method: 'POST', body: JSON.stringify(payload) });
+      toast('Event created', 'success');
+    }
+    closeEventForm();
+    loadOrganizerEvents();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.textContent = editId ? 'Save Changes' : 'Create Event';
+  }
+}
+
+async function deleteEvent(id) {
+  if (!confirm('Delete this event? This cannot be undone.')) return;
+  try {
+    await api(`/events/${id}`, { method: 'DELETE' });
+    toast('Event deleted', 'success');
+    goHome();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+/* ═══════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════ */
+function switchTab(tab, btnEl) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+  document.getElementById('tab-browse').classList.toggle('hidden', tab !== 'browse');
+  document.getElementById('tab-my-bookings').classList.toggle('hidden', tab !== 'my-bookings');
+  if (tab === 'browse') loadAllEvents();
+  if (tab === 'my-bookings') loadMyBookings();
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+function toast(msg, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; setTimeout(() => el.remove(), 300); }, 3500);
+}
+
+/* ═══════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════ */
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+restoreSession();
+</script>
+</body>
+</html>
